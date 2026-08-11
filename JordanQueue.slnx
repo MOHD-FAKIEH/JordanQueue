@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/JordanQueue.Api/JordanQueue.Api.csproj" />
+    <Project Path="src/JordanQueue.Application/JordanQueue.Application.csproj" />
+    <Project Path="src/JordanQueue.Domain/JordanQueue.Domain.csproj" />
+    <Project Path="src/JordanQueue.Infrastructure/JordanQueue.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/JordanQueue.IntegrationTests/JordanQueue.IntegrationTests.csproj" />
+    <Project Path="tests/JordanQueue.UnitTests/JordanQueue.UnitTests.csproj" />
+  </Folder>
+</Solution>
