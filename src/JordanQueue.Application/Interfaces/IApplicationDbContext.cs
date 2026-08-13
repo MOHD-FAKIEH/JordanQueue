@@ -16,5 +16,7 @@ public interface IApplicationDbContext
     IQueryable<Notification> Notifications { get; }
     IQueryable<RefreshToken> RefreshTokens { get; }
 
+    Task AddEntityAsync<TEntity>(TEntity entity, CancellationToken cancellationToken = default) where TEntity : class;
+    void UpdateEntity<TEntity>(TEntity entity) where TEntity : class;
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

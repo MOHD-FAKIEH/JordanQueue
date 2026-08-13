@@ -41,6 +41,12 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     IQueryable<Notification> IApplicationDbContext.Notifications => NotificationsSet.AsQueryable();
     IQueryable<RefreshToken> IApplicationDbContext.RefreshTokens => RefreshTokensSet.AsQueryable();
 
+    Task IApplicationDbContext.AddEntityAsync<TEntity>(TEntity entity, CancellationToken cancellationToken) =>
+        Set<TEntity>().AddAsync(entity, cancellationToken).AsTask();
+
+    void IApplicationDbContext.UpdateEntity<TEntity>(TEntity entity) =>
+        Set<TEntity>().Update(entity);
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.AddInterceptors(_auditableEntityInterceptor);

@@ -13,6 +13,64 @@ All responses use the standard envelope:
 }
 ```
 
+## Phase 2 — Implemented
+
+### Authentication
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/register` | Anonymous | Register customer or business owner |
+| POST | `/api/auth/login` | Anonymous | Login with email/mobile + password |
+| POST | `/api/auth/refresh` | Anonymous | Refresh JWT access token |
+
+### Businesses
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/businesses` | Anonymous | Search/list businesses |
+| GET | `/api/businesses/{id}` | Anonymous | Business details + queue summary |
+| POST | `/api/businesses` | BusinessOwner | Create business |
+| PUT | `/api/businesses/{id}` | BusinessOwner | Update business |
+| GET | `/api/businesses/{businessId}/queue` | Anonymous | Current queue for today |
+| POST | `/api/businesses/{businessId}/queue/open` | Owner/Staff | Open today's queue |
+| POST | `/api/businesses/{businessId}/queue/join` | Customer | Join queue |
+| GET | `/api/businesses/{businessId}/stats/daily` | Owner/Staff | Daily statistics |
+
+### Services
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/businesses/{businessId}/services` | Anonymous | List services |
+| POST | `/api/businesses/{businessId}/services` | Owner/Staff | Create service |
+| PUT | `/api/services/{id}` | Owner/Staff | Update service |
+
+### Queues
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/queues/{queueId}` | Anonymous | Queue details |
+| GET | `/api/queues/{queueId}/position` | Customer | Your position |
+| POST | `/api/queues/{queueId}/next` | Owner/Staff | Call next customer |
+| POST | `/api/queues/{queueId}/pause` | Owner/Staff | Pause queue |
+| POST | `/api/queues/{queueId}/resume` | Owner/Staff | Resume queue |
+
+### Tickets
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/tickets/mine` | Authenticated | Customer ticket history |
+| GET | `/api/tickets/{id}` | Authenticated | Ticket details |
+| POST | `/api/tickets/{id}/cancel` | Customer/Staff | Cancel ticket |
+| POST | `/api/tickets/{id}/serve` | Owner/Staff | Mark served |
+| POST | `/api/tickets/{id}/skip` | Owner/Staff | Skip customer |
+
+### Notifications
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/notifications` | Authenticated | List notifications |
+| POST | `/api/notifications/{id}/read` | Authenticated | Mark as read |
+
 ## Phase 1 — Implemented
 
 | Method | Endpoint | Description |

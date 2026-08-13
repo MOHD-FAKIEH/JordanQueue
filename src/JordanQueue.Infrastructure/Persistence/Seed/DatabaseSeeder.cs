@@ -308,4 +308,7 @@ public static class DatabaseSeeder
         var hash = SHA256.HashData(Encoding.UTF8.GetBytes(password + Convert.ToBase64String(salt)));
         return Convert.ToBase64String(hash);
     }
+
+    public static bool VerifyLegacyPassword(string password, string passwordHash) =>
+        HashPassword(password) == passwordHash;
 }

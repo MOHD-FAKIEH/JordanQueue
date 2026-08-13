@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using JordanQueue.Api;
 using JordanQueue.Application;
 using JordanQueue.Application.Common;
 using JordanQueue.Application.Exceptions;
@@ -10,7 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddApiAuthentication(builder.Configuration);
 
 builder.Services.AddControllers()
     .ConfigureApiBehaviorOptions(options =>
@@ -32,17 +35,18 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new() { Title = "Jordan Queue API", Version = "v1" });
-});
+builder.Services.AddApiSwagger();
 
-builder.Services.AddHealthChecks()
-    .AddCheck("self", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy())
-    .AddSqlServer(
+var healthChecksBuilder = builder.Services.AddHealthChecks()
+    .AddCheck("self", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy());
+
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    healthChecksBuilder.AddSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")!,
         name: "sqlserver",
         tags: ["ready"]);
+}
 
 builder.Services.AddProblemDetails();
 
@@ -98,6 +102,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
 {
