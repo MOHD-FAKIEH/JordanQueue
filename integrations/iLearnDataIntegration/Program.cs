@@ -15,6 +15,11 @@ namespace iLearnDataIntegration
 {
     class Program
     {
+        static readonly JsonSerializerOptions TrackingJsonOptions = new JsonSerializerOptions
+        {
+            WriteIndented = true
+        };
+
         static readonly string apiUrl = ConfigurationManager.AppSettings["ApiUrl"];
         static readonly string username = ConfigurationManager.AppSettings["ApiUsername"];
         static readonly string password = ConfigurationManager.AppSettings["ApiPassword"];
@@ -82,9 +87,9 @@ namespace iLearnDataIntegration
                         Log($"Employee {empNumber} - NEW RECORD");
                         needsUpload = true;
                     }
-                    else if (uploadedEmployees[empNumber] != hash)
+                    else if (uploadedEmployees[empNumber].Hash != hash)
                     {
-                        Log($"Employee {empNumber} - DATA CHANGED");
+                        LogFieldChanges(empNumber, employee, uploadedEmployees[empNumber]);
                         needsUpload = true;
                     }
                     else
@@ -119,7 +124,12 @@ namespace iLearnDataIntegration
                             {
                                 Log($"Employee {empNumber} - SUCCESS");
 
-                                uploadedEmployees[empNumber] = hash;
+                                uploadedEmployees[empNumber] = new UploadedEmployeeState
+                                {
+                                    Hash = hash,
+                                    UploadedAt = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                                    Payload = ToPayload(employee)
+                                };
 
                                 SaveUploadedEmployees(uploadedEmployees);
 
@@ -216,34 +226,135 @@ namespace iLearnDataIntegration
             return list;
         }
 
-        static Dictionary<string, string> LoadUploadedEmployees()
+        static void LogFieldChanges(
+            string empNumber,
+            Dictionary<string, object> current,
+            UploadedEmployeeState previous)
         {
-            var result = new Dictionary<string, string>();
+            var changes = GetChangedFields(current, previous?.Payload);
+
+            if (changes.Count == 0)
+            {
+                if (previous?.Payload == null || previous.Payload.Count == 0)
+                {
+                    Log($"Employee {empNumber} - DATA CHANGED (previous field values not stored yet; they will be stored after this successful upload)");
+                }
+                else
+                {
+                    Log($"Employee {empNumber} - DATA CHANGED (hash changed, no mapped field value difference found)");
+                }
+
+                return;
+            }
+
+            Log($"Employee {empNumber} - DATA CHANGED ({changes.Count} field(s))");
+
+            foreach (var change in changes)
+                Log($"Employee {empNumber} - FIELD {change}");
+        }
+
+        static List<string> GetChangedFields(
+            Dictionary<string, object> current,
+            Dictionary<string, string> previous)
+        {
+            var changes = new List<string>();
+            var keys = new SortedSet<string>(current.Keys, StringComparer.Ordinal);
+
+            if (previous != null)
+            {
+                foreach (var key in previous.Keys)
+                    keys.Add(key);
+            }
+
+            foreach (var key in keys)
+            {
+                if (string.Equals(key, "EmployeeNumber", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                var newValue = current.TryGetValue(key, out var currentValue)
+                    ? currentValue?.ToString() ?? string.Empty
+                    : string.Empty;
+
+                var oldValue = previous != null && previous.TryGetValue(key, out var previousValue)
+                    ? previousValue ?? string.Empty
+                    : string.Empty;
+
+                if (previous == null || previous.Count == 0)
+                    continue;
+
+                if (!string.Equals(oldValue, newValue, StringComparison.Ordinal))
+                {
+                    changes.Add($"{key}: '{FormatLogValue(oldValue)}' -> '{FormatLogValue(newValue)}'");
+                }
+            }
+
+            return changes;
+        }
+
+        static string FormatLogValue(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return string.Empty;
+
+            const int maxLength = 200;
+            var sanitized = value.Replace("\r", " ").Replace("\n", " ");
+            return sanitized.Length <= maxLength
+                ? sanitized
+                : sanitized.Substring(0, maxLength) + "...";
+        }
+
+        static Dictionary<string, string> ToPayload(Dictionary<string, object> employee)
+        {
+            var payload = new Dictionary<string, string>();
+
+            foreach (var pair in employee)
+                payload[pair.Key] = pair.Value?.ToString() ?? string.Empty;
+
+            return payload;
+        }
+
+        static Dictionary<string, UploadedEmployeeState> LoadUploadedEmployees()
+        {
+            var result = new Dictionary<string, UploadedEmployeeState>();
 
             if (!File.Exists(uploadedEmployeesFile))
                 return result;
 
-            var lines = File.ReadAllLines(uploadedEmployeesFile);
+            var content = File.ReadAllText(uploadedEmployeesFile);
 
-            foreach (var line in lines)
+            if (string.IsNullOrWhiteSpace(content))
+                return result;
+
+            var trimmed = content.TrimStart();
+
+            if (trimmed.StartsWith("{"))
+            {
+                var parsed = JsonSerializer.Deserialize<Dictionary<string, UploadedEmployeeState>>(content);
+                return parsed ?? result;
+            }
+
+            foreach (var line in File.ReadAllLines(uploadedEmployeesFile))
             {
                 var parts = line.Split('|');
 
-                if (parts.Length >= 2)
+                if (parts.Length >= 2 && !string.IsNullOrWhiteSpace(parts[0]))
                 {
-                    result[parts[0]] = parts[1];
+                    result[parts[0]] = new UploadedEmployeeState
+                    {
+                        Hash = parts[1],
+                        UploadedAt = parts.Length >= 3 ? parts[2] : string.Empty,
+                        Payload = new Dictionary<string, string>()
+                    };
                 }
             }
 
             return result;
         }
 
-        static void SaveUploadedEmployees(Dictionary<string, string> employees)
+        static void SaveUploadedEmployees(Dictionary<string, UploadedEmployeeState> employees)
         {
-            var lines = employees.Select(x =>
-                $"{x.Key}|{x.Value}|{DateTime.Now:yyyy-MM-dd HH:mm:ss}");
-
-            File.WriteAllLines(uploadedEmployeesFile, lines);
+            var json = JsonSerializer.Serialize(employees, TrackingJsonOptions);
+            File.WriteAllText(uploadedEmployeesFile, json);
         }
 
         static string GenerateHash(string input)
@@ -262,5 +373,12 @@ namespace iLearnDataIntegration
                 logPath,
                 $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}{Environment.NewLine}");
         }
+    }
+
+    class UploadedEmployeeState
+    {
+        public string Hash { get; set; } = string.Empty;
+        public string UploadedAt { get; set; } = string.Empty;
+        public Dictionary<string, string> Payload { get; set; } = new Dictionary<string, string>();
     }
 }

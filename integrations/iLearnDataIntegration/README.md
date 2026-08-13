@@ -12,6 +12,16 @@ Posts employee records to the iLearn API from **SQL Server**. Process output is 
 
 `PostAsync` sends mapped employee JSON from the database. If any mapped field changes, the full record is posted.
 
+When a record changes, the log file lists each mapped field that differs, with the previous and new values:
+
+```
+Employee 10001 - DATA CHANGED (2 field(s))
+Employee 10001 - FIELD JobTitle: 'HR Officer' -> 'HR Specialist'
+Employee 10001 - FIELD DutyStation: 'Amman' -> 'Aqaba'
+```
+
+The first successful run after this change stores the last posted values in `UploadedEmployeesFile`. Field-level diffs appear on later runs. Old hash-only tracking files are still read; they are rewritten as JSON after the next successful upload.
+
 Logs are only appended to the log file. Nothing is inserted into a log table.
 
 ## Configure
