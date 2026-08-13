@@ -1,27 +1,27 @@
-# iLearn employee integration (file source)
+# iLearn employee integration
 
-Posts employee records to the iLearn API from a **JSON or CSV file**, not from SQL Server.
+Posts employee records to the iLearn API from **SQL Server**. Process output is written to a **log file**, not to the database.
 
-## What changed
+## Data vs log
 
-- `GetEmployeesFromDatabase()` and `DbConnection` were removed.
-- Employees are loaded from `EmployeesFile` (or a path passed as the first argument).
-- Each changed record is still sent with `HttpClient.PostAsync` as JSON.
-- Hash-based skip logic is unchanged: if any mapped field changes, the full record is posted.
+| What | Where |
+|---|---|
+| Employee records | Database view `[IH_MasterData].[HR].[v_iLearn]` |
+| Process log | File at `LogPath` (default `logs\ilearn-integration.log`) |
+| Last-upload hashes | File at `UploadedEmployeesFile` |
+
+`PostAsync` sends mapped employee JSON from the database. If any mapped field changes, the full record is posted.
+
+Logs are only appended to the log file. Nothing is inserted into a log table.
 
 ## Configure
 
 In `App.config`:
 
+- `DbConnection` — SQL Server connection string
 - `ApiUrl`, `ApiUsername`, `ApiPassword`
-- `EmployeesFile` — path to `employees.json` or `employees.csv`
-- `UploadedEmployeesFile`, `LogPath`, `MaxRetries`
-
-Copy a sample file:
-
-```bash
-cp employees.sample.json employees.json
-```
+- `LogPath` — log file path
+- `UploadedEmployeesFile`, `MaxRetries`
 
 ## Run
 
@@ -29,16 +29,4 @@ cp employees.sample.json employees.json
 dotnet run --project integrations/iLearnDataIntegration/iLearnDataIntegration.csproj
 ```
 
-Or pass a file path:
-
-```bash
-dotnet run --project integrations/iLearnDataIntegration/iLearnDataIntegration.csproj -- /path/to/employees.csv
-```
-
-## File columns
-
-JSON array objects or CSV headers should use these names:
-
-`EmployeeNumber`, `First_name`, `Last_name`, `Email`, `Department`, `Division`, `JobTitle`, `DutyStation`, `Area`, `Gender`, `EmpGroup`, `EmpSubGroup`, `EntryOfDuty`, `Grade`, `IsActive`
-
-`DutyStation` and `Area` are sent as separate fields. `IsActive` defaults to `Active` when omitted.
+`DutyStation` and `Area` are sent as separate fields from the view columns of the same names.

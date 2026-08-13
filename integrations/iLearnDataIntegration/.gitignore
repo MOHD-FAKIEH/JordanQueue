@@ -2,6 +2,4 @@ bin/
 obj/
 logs/
 uploaded-employees.txt
-employees.json
-employees.csv
 *.user

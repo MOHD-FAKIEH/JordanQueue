@@ -1,3 +1,4 @@
+using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -14,31 +15,9 @@ namespace iLearnDataIntegration
 {
     class Program
     {
-        static readonly string[] MappedFields =
-        {
-            "EmployeeNumber",
-            "First_name",
-            "Last_name",
-            "Email",
-            "Department",
-            "Division",
-            "JobTitle",
-            "DutyStation",
-            "Gender",
-            "EmpGroup",
-            "EmpSubGroup",
-            "IsActive",
-            "EntryOfDuty",
-            "Area",
-            "Grade"
-        };
-
         static readonly string apiUrl = ConfigurationManager.AppSettings["ApiUrl"];
         static readonly string username = ConfigurationManager.AppSettings["ApiUsername"];
         static readonly string password = ConfigurationManager.AppSettings["ApiPassword"];
-
-        static readonly string employeesFile =
-            ConfigurationManager.AppSettings["EmployeesFile"];
 
         static readonly string uploadedEmployeesFile =
             ConfigurationManager.AppSettings["UploadedEmployeesFile"];
@@ -48,6 +27,9 @@ namespace iLearnDataIntegration
 
         static readonly int maxRetries =
             int.Parse(ConfigurationManager.AppSettings["MaxRetries"]);
+
+        static readonly string connectionString =
+            ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString;
 
         static async Task Main(string[] args)
         {
@@ -59,12 +41,9 @@ namespace iLearnDataIntegration
 
                 Log("===== PROCESS STARTED =====");
 
-                var sourceFile = ResolveEmployeesFile(args);
-                Log($"Loading employees from file: {sourceFile}");
+                var employees = GetEmployeesFromDatabase();
 
-                var employees = GetEmployeesFromFile(sourceFile);
-
-                Log($"Loaded {employees.Count} employee record(s) from file");
+                Log($"Loaded {employees.Count} employee record(s) from database");
 
                 var uploadedEmployees = LoadUploadedEmployees();
 
@@ -181,156 +160,60 @@ namespace iLearnDataIntegration
             }
         }
 
-        static string ResolveEmployeesFile(string[] args)
+        static List<Dictionary<string, object>> GetEmployeesFromDatabase()
         {
-            if (args != null && args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
-                return args[0];
-
-            if (string.IsNullOrWhiteSpace(employeesFile))
-                throw new InvalidOperationException(
-                    "EmployeesFile is not configured. Set App.config EmployeesFile or pass a file path as the first argument.");
-
-            return employeesFile;
-        }
-
-        static List<Dictionary<string, object>> GetEmployeesFromFile(string path)
-        {
-            if (!File.Exists(path))
-                throw new FileNotFoundException("Employees file not found.", path);
-
-            var extension = Path.GetExtension(path).ToLowerInvariant();
-
-            if (extension == ".json")
-                return LoadEmployeesFromJson(path);
-
-            if (extension == ".csv")
-                return LoadEmployeesFromCsv(path);
-
-            throw new NotSupportedException(
-                $"Unsupported employees file type '{extension}'. Use .json or .csv.");
-        }
-
-        static List<Dictionary<string, object>> LoadEmployeesFromJson(string path)
-        {
-            var json = File.ReadAllText(path);
-            using var document = JsonDocument.Parse(json);
-
-            if (document.RootElement.ValueKind != JsonValueKind.Array)
-                throw new InvalidDataException("Employees JSON must be an array of objects.");
-
             var list = new List<Dictionary<string, object>>();
 
-            foreach (var element in document.RootElement.EnumerateArray())
+            using var conn = new SqlConnection(connectionString);
+
+            conn.Open();
+
+            string sql = @"SELECT [EmployeeNumber]
+      ,[EmployeeFullName]
+      ,[First_name]
+      ,[Last_name]
+      ,[Email]
+      ,[Department]
+      ,[Division]
+      ,[JobTitle]
+      ,[Grade]
+      ,[DutyStation]
+      ,[Area]
+      ,[Gender]
+      ,[EmpGroup]
+      ,[EmpSubGroup]
+      ,[EntryOfDuty]
+  FROM [IH_MasterData].[HR].[v_iLearn]";
+
+            using var cmd = new SqlCommand(sql, conn);
+
+            using var reader = cmd.ExecuteReader();
+
+            while (reader.Read())
             {
-                if (element.ValueKind != JsonValueKind.Object)
-                    continue;
+                var row = new Dictionary<string, object>
+                {
+                    ["EmployeeNumber"] = reader["EmployeeNumber"]?.ToString(),
+                    ["First_name"] = reader["First_name"]?.ToString(),
+                    ["Last_name"] = reader["Last_name"]?.ToString(),
+                    ["Email"] = reader["Email"]?.ToString(),
+                    ["Department"] = reader["Department"]?.ToString(),
+                    ["Division"] = reader["Division"]?.ToString(),
+                    ["JobTitle"] = reader["JobTitle"]?.ToString(),
+                    ["DutyStation"] = reader["DutyStation"]?.ToString(),
+                    ["Gender"] = reader["Gender"]?.ToString(),
+                    ["EmpGroup"] = reader["EmpGroup"]?.ToString(),
+                    ["EmpSubGroup"] = reader["EmpSubGroup"]?.ToString(),
+                    ["IsActive"] = "Active",
+                    ["EntryOfDuty"] = reader["EntryOfDuty"]?.ToString(),
+                    ["Area"] = reader["Area"]?.ToString(),
+                    ["Grade"] = reader["Grade"]?.ToString()
+                };
 
-                var raw = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-                foreach (var property in element.EnumerateObject())
-                    raw[property.Name] = JsonElementToString(property.Value);
-
-                list.Add(MapEmployee(raw));
+                list.Add(row);
             }
 
             return list;
-        }
-
-        static List<Dictionary<string, object>> LoadEmployeesFromCsv(string path)
-        {
-            var lines = File.ReadAllLines(path)
-                .Where(line => !string.IsNullOrWhiteSpace(line))
-                .ToArray();
-
-            if (lines.Length < 2)
-                throw new InvalidDataException("Employees CSV must include a header row and at least one data row.");
-
-            var headers = ParseCsvLine(lines[0]);
-            var list = new List<Dictionary<string, object>>();
-
-            for (int i = 1; i < lines.Length; i++)
-            {
-                var values = ParseCsvLine(lines[i]);
-                var raw = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-                for (int column = 0; column < headers.Count; column++)
-                {
-                    var header = headers[column];
-                    if (string.IsNullOrWhiteSpace(header))
-                        continue;
-
-                    raw[header] = column < values.Count ? values[column] : string.Empty;
-                }
-
-                list.Add(MapEmployee(raw));
-            }
-
-            return list;
-        }
-
-        static Dictionary<string, object> MapEmployee(Dictionary<string, string> raw)
-        {
-            var row = new Dictionary<string, object>();
-
-            foreach (var field in MappedFields)
-            {
-                if (raw.TryGetValue(field, out var value) && !string.IsNullOrWhiteSpace(value))
-                    row[field] = value;
-                else
-                    row[field] = field == "IsActive" ? "Active" : string.Empty;
-            }
-
-            return row;
-        }
-
-        static string JsonElementToString(JsonElement element)
-        {
-            return element.ValueKind switch
-            {
-                JsonValueKind.Null => string.Empty,
-                JsonValueKind.String => element.GetString() ?? string.Empty,
-                JsonValueKind.True => "true",
-                JsonValueKind.False => "false",
-                JsonValueKind.Number => element.GetRawText(),
-                _ => element.GetRawText()
-            };
-        }
-
-        static List<string> ParseCsvLine(string line)
-        {
-            var values = new List<string>();
-            var current = new StringBuilder();
-            bool inQuotes = false;
-
-            for (int i = 0; i < line.Length; i++)
-            {
-                char c = line[i];
-
-                if (c == '"')
-                {
-                    if (inQuotes && i + 1 < line.Length && line[i + 1] == '"')
-                    {
-                        current.Append('"');
-                        i++;
-                    }
-                    else
-                    {
-                        inQuotes = !inQuotes;
-                    }
-                }
-                else if (c == ',' && !inQuotes)
-                {
-                    values.Add(current.ToString().Trim());
-                    current.Clear();
-                }
-                else
-                {
-                    current.Append(c);
-                }
-            }
-
-            values.Add(current.ToString().Trim());
-            return values;
         }
 
         static Dictionary<string, string> LoadUploadedEmployees()
