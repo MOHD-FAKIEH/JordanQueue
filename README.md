@@ -118,7 +118,11 @@ Phase 1 (Foundation) includes:
 - Docker Compose for SQL Server
 - GitHub Actions CI pipeline
 
-**Next:** Phase 2 — Core Queue Engine (authentication, businesses, queue operations)
+**Next:** Phase 3 — Admin Portal (React dashboard)
+
+## Current Status — Phase 2 Complete
+
+Phase 2 adds JWT authentication, business/service management, the full queue engine (join, call next, serve, skip, cancel), position/wait calculation, and in-app notifications.
 
 ## License
 
