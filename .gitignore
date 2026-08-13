@@ -1,0 +1,61 @@
+## Build and test artifacts
+bin/
+obj/
+out/
+TestResults/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## IDE
+.vs/
+.idea/
+*.swp
+*.swo
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+
+## Environment and secrets
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.local.json
+secrets.json
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Node (future mobile/admin)
+node_modules/
+dist/
+.expo/
+.expo-shared/
+
+## Docker
+docker-compose.override.yml
+
+## Logs
+*.log
+logs/
+
+## Database
+*.mdf
+*.ldf
+
+## NuGet
+*.nupkg
+packages/
+
+## Coverage
+coverage/
+*.coverage
+*.coveragexml
+
+## Misc
+*.db
+*.sqlite
