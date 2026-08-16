@@ -1,0 +1,82 @@
+{
+  "app": {
+    "title": "Jordan Queue"
+  },
+  "tabs": {
+    "explore": "Explore",
+    "tickets": "My tickets",
+    "notifications": "Notifications"
+  },
+  "home": {
+    "search": "Search businesses...",
+    "empty": "No businesses found",
+    "loading": "Loading..."
+  },
+  "business": {
+    "services": "Services",
+    "join": "Join queue",
+    "waiting": "Waiting",
+    "nowServing": "Now serving",
+    "estimatedWait": "Est. wait",
+    "minutes": "min",
+    "queueClosed": "Queue not open today",
+    "loginRequired": "Sign in to join the queue"
+  },
+  "ticket": {
+    "yourNumber": "Your ticket",
+    "position": "Position",
+    "status": "Status",
+    "nowServing": "Now serving",
+    "estimatedWait": "Estimated wait",
+    "cancel": "Cancel ticket",
+    "refresh": "Refreshing...",
+    "statuses": {
+      "0": "Waiting",
+      "1": "Called",
+      "2": "Serving",
+      "3": "Served",
+      "4": "Skipped",
+      "5": "Cancelled"
+    }
+  },
+  "tickets": {
+    "title": "My tickets",
+    "empty": "No tickets yet",
+    "active": "Active"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "markRead": "Mark read"
+  },
+  "auth": {
+    "login": "Sign in",
+    "register": "Create account",
+    "email": "Email or mobile",
+    "password": "Password",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "mobile": "Mobile number",
+    "emailField": "Email",
+    "submitLogin": "Sign in",
+    "submitRegister": "Register",
+    "noAccount": "No account? Register",
+    "hasAccount": "Already have an account? Sign in",
+    "logout": "Sign out",
+    "profile": "Account"
+  },
+  "categories": {
+    "0": "Clinics",
+    "1": "Barbers",
+    "2": "Car services",
+    "3": "Government",
+    "4": "Repair",
+    "5": "Beauty",
+    "6": "Other"
+  },
+  "common": {
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "back": "Back"
+  }
+}

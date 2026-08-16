@@ -51,7 +51,7 @@ The MVP is complete when this end-to-end flow works:
 | 1 — Foundation | ✅ Complete | Solution, DB, API shell, docs, CI |
 | 2 — Core Queue Engine | ✅ Complete | Auth, businesses, queue operations |
 | 3 — Admin Portal | ✅ Complete | React dashboard |
-| 4 — Mobile App | Planned | React Native customer app |
+| 4 — Mobile App | 🚧 In Progress | React Native customer app |
 | 5 — Notifications | Planned | In-app + FCM prep |
 | 6 — Testing | Planned | Concurrency, auth, RTL tests |
 | 7 — Deployment | Planned | Docker, staging, production |

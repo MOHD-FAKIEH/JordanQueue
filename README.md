@@ -27,7 +27,7 @@ tests/
 |-------|------------|
 | Backend | ASP.NET Core 10 (LTS), C#, EF Core |
 | Database | SQL Server |
-| Mobile | React Native + Expo + TypeScript (planned) |
+| Mobile | React Native + Expo + TypeScript |
 | Admin | React + Vite + MUI + TypeScript |
 | Auth | JWT + refresh tokens (Phase 2) |
 | Deployment | Docker, GitHub Actions |
@@ -73,7 +73,17 @@ Open http://localhost:5173 and sign in with a **BusinessOwner** or **Staff** see
 
 The dev server proxies `/api` to the backend. CORS is also enabled for `localhost:5173`.
 
-### 4. Run Tests
+### 4. Run the Mobile App
+
+```bash
+cd mobile/JordanQueue.Mobile
+npm install
+npm start
+```
+
+Use Expo Go on your phone or an emulator. See [mobile/JordanQueue.Mobile/README.md](mobile/JordanQueue.Mobile/README.md) for API URL setup on physical devices.
+
+### 5. Run Tests
 
 ```bash
 dotnet test
@@ -113,6 +123,10 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for seed credentials and local setup detail
 - [docs/database/database-design.md](docs/database/database-design.md)
 - [docs/api/api-overview.md](docs/api/api-overview.md)
 - [docs/requirements/mvp-requirements.md](docs/requirements/mvp-requirements.md)
+
+## Current Status — Phase 4 In Progress
+
+Phase 4 adds the React Native (Expo) customer mobile app: business search, join queue, live ticket tracking, notifications, and Arabic/English support.
 
 ## Current Status — Phase 3 Complete
 

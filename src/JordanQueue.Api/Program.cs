@@ -52,11 +52,13 @@ builder.Services.AddProblemDetails();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AdminPortal", policy =>
+    options.AddPolicy("Clients", policy =>
     {
         policy.WithOrigins(
                 "http://localhost:5173",
-                "http://127.0.0.1:5173")
+                "http://127.0.0.1:5173",
+                "http://localhost:8081",
+                "http://127.0.0.1:8081")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -114,7 +116,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("AdminPortal");
+app.UseCors("Clients");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
