@@ -24,9 +24,9 @@ export function LanguageSwitcher() {
 
 export function BusinessSelector() {
   const { t, i18n } = useTranslation()
-  const { businesses, selectedBusiness, selectBusiness } = useBusiness()
+  const { businesses, selectedBusiness, selectBusiness, loading } = useBusiness()
 
-  if (businesses.length <= 1) return null
+  if (loading || businesses.length === 0) return null
 
   const label = (b: (typeof businesses)[0]) =>
     i18n.language === 'ar' ? b.nameArabic : b.nameEnglish
@@ -36,12 +36,14 @@ export function BusinessSelector() {
       size="small"
       value={selectedBusiness?.id ?? ''}
       onChange={(e) => selectBusiness(e.target.value)}
-      sx={{ minWidth: 180, bgcolor: 'background.paper' }}
+      sx={{ minWidth: 200, bgcolor: 'background.paper', color: 'text.primary' }}
       displayEmpty
     >
-      <MenuItem value="" disabled>
-        {t('common.selectBusiness')}
-      </MenuItem>
+      {businesses.length > 1 && (
+        <MenuItem value="" disabled>
+          {t('common.selectBusiness')}
+        </MenuItem>
+      )}
       {businesses.map((b) => (
         <MenuItem key={b.id} value={b.id}>
           {label(b)}
