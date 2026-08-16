@@ -28,6 +28,7 @@ All responses use the standard envelope:
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/api/businesses` | Anonymous | Search/list businesses |
+| GET | `/api/businesses/mine` | Owner/Staff | Businesses assigned to current user |
 | GET | `/api/businesses/{id}` | Anonymous | Business details + queue summary |
 | POST | `/api/businesses` | BusinessOwner | Create business |
 | PUT | `/api/businesses/{id}` | BusinessOwner | Update business |

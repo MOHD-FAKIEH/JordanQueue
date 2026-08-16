@@ -34,6 +34,14 @@ public class BusinessesController : ControllerBase
         return Ok(ApiResponse<PagedResult<BusinessDto>>.Ok(result));
     }
 
+    [Authorize(Roles = $"{RoleNames.BusinessOwner},{RoleNames.Staff}")]
+    [HttpGet("mine")]
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<BusinessDto>>>> GetMine(CancellationToken cancellationToken)
+    {
+        var result = await _businessService.GetMineAsync(GetUserId(), cancellationToken);
+        return Ok(ApiResponse<IReadOnlyList<BusinessDto>>.Ok(result));
+    }
+
     [AllowAnonymous]
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ApiResponse<BusinessDetailDto>>> GetById(Guid id, CancellationToken cancellationToken)

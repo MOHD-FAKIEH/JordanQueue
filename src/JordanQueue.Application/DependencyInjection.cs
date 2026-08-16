@@ -4,6 +4,7 @@ using JordanQueue.Application.Interfaces;
 using JordanQueue.Application.Interfaces.Auth;
 using JordanQueue.Application.Interfaces.Businesses;
 using JordanQueue.Application.Interfaces.Services;
+using JordanQueue.Application.Interfaces.Staff;
 using JordanQueue.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IBusinessService, BusinessService>();
         services.AddScoped<IServiceManagementService, ServiceManagementService>();
+        services.AddScoped<IStaffService, StaffService>();
         return services;
     }
 }

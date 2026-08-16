@@ -355,6 +355,24 @@ public class QueueService : IQueueService
         return await MapTicketDtoAsync(ticket, cancellationToken);
     }
 
+    public async Task<IReadOnlyList<TicketDto>> GetQueueTicketsAsync(Guid queueId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        await GetQueueForStaffAsync(queueId, userId, cancellationToken);
+
+        var tickets = await _context.QueueTicketsSet
+            .Where(t => t.QueueId == queueId)
+            .OrderBy(t => t.TicketNumber)
+            .ToListAsync(cancellationToken);
+
+        var result = new List<TicketDto>();
+        foreach (var ticket in tickets)
+        {
+            result.Add(await MapTicketDtoAsync(ticket, cancellationToken));
+        }
+
+        return result;
+    }
+
     public async Task<DailyStatsDto> GetDailyStatsAsync(Guid businessId, Guid userId, CancellationToken cancellationToken = default)
     {
         await _businessService.EnsureOwnerOrStaffAccessAsync(businessId, userId, cancellationToken);

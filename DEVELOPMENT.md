@@ -62,6 +62,24 @@ The API auto-migrates and seeds data on startup in Development mode.
 
 Sample queue data is seeded for **Amman Barber** with tickets A001–A003.
 
+### Run Admin Portal
+
+```bash
+cd admin/JordanQueue.Admin
+npm install
+npm run dev
+```
+
+- URL: http://localhost:5173
+- Login as **owner1@jordanqueue.dev** / `Owner123!` or **staff1@jordanqueue.dev** / `Staff123!`
+- Select **Amman Barber** to manage the seeded queue (tickets A001–A003)
+
+Build for production:
+
+```bash
+npm run build
+```
+
 ## Project Structure
 
 ```

@@ -28,7 +28,7 @@ tests/
 | Backend | ASP.NET Core 10 (LTS), C#, EF Core |
 | Database | SQL Server |
 | Mobile | React Native + Expo + TypeScript (planned) |
-| Admin | React + Vite + TypeScript (planned) |
+| Admin | React + Vite + MUI + TypeScript |
 | Auth | JWT + refresh tokens (Phase 2) |
 | Deployment | Docker, GitHub Actions |
 
@@ -36,7 +36,7 @@ tests/
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for SQL Server)
-- Node.js 20+ (for mobile/admin — future phases)
+- Node.js 20+ (for admin portal and mobile)
 
 ## Quick Start
 
@@ -57,12 +57,23 @@ dotnet run
 
 On first run in Development, the API automatically applies migrations and seeds sample data.
 
-- Swagger UI: http://localhost:5080/swagger (port may vary — check console output)
-- Health (liveness): http://localhost:5080/health
-- Health (readiness + SQL): http://localhost:5080/health/ready
-- API health: http://localhost:5080/api/health
+- Swagger UI: http://localhost:5257/swagger (port may vary — check console output)
+- Health (liveness): http://localhost:5257/health
+- Health (readiness + SQL): http://localhost:5257/health/ready
 
-### 3. Run Tests
+### 3. Run the Admin Portal
+
+```bash
+cd admin/JordanQueue.Admin
+npm install
+npm run dev
+```
+
+Open http://localhost:5173 and sign in with a **BusinessOwner** or **Staff** seed account (see [DEVELOPMENT.md](DEVELOPMENT.md)).
+
+The dev server proxies `/api` to the backend. CORS is also enabled for `localhost:5173`.
+
+### 4. Run Tests
 
 ```bash
 dotnet test
@@ -103,22 +114,11 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for seed credentials and local setup detail
 - [docs/api/api-overview.md](docs/api/api-overview.md)
 - [docs/requirements/mvp-requirements.md](docs/requirements/mvp-requirements.md)
 
-## Current Status — Phase 1 Complete
+## Current Status — Phase 3 Complete
 
-Phase 1 (Foundation) includes:
+Phase 3 adds the React admin portal with login, dashboard, queue management, services CRUD, staff management, and business settings. Arabic/English with RTL/LTR support.
 
-- .NET solution with Domain, Application, Infrastructure, and API projects
-- Domain entities and EF Core configurations
-- Initial database migration
-- Swagger/OpenAPI
-- Global exception handling with consistent API responses
-- Health checks (liveness + readiness)
-- Development seed data
-- Unit and integration tests
-- Docker Compose for SQL Server
-- GitHub Actions CI pipeline
-
-**Next:** Phase 3 — Admin Portal (React dashboard)
+**Next:** Phase 4 — Mobile App (React Native customer app)
 
 ## Current Status — Phase 2 Complete
 

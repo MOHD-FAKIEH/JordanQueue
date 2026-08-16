@@ -1,0 +1,111 @@
+{
+  "app": {
+    "title": "Jordan Queue Admin",
+    "subtitle": "Business dashboard"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "queue": "Queue",
+    "services": "Services",
+    "staff": "Staff",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "login": {
+    "title": "Sign in",
+    "email": "Email or mobile",
+    "password": "Password",
+    "submit": "Sign in",
+    "error": "Invalid credentials"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "waiting": "Waiting",
+    "serving": "Serving",
+    "servedToday": "Served today",
+    "avgWait": "Avg wait (min)",
+    "avgService": "Avg service (min)",
+    "nowServing": "Now serving",
+    "noQueue": "No active queue today",
+    "openQueue": "Open queue"
+  },
+  "queue": {
+    "title": "Queue management",
+    "selectService": "Service",
+    "openQueue": "Open queue",
+    "callNext": "Call next",
+    "pause": "Pause",
+    "resume": "Resume",
+    "waiting": "Waiting",
+    "nowServing": "Now serving",
+    "estimatedWait": "Est. wait",
+    "noTickets": "No tickets in queue",
+    "serve": "Serve",
+    "skip": "Skip",
+    "cancel": "Cancel",
+    "status": {
+      "open": "Open",
+      "paused": "Paused",
+      "closed": "Closed"
+    },
+    "ticketStatus": {
+      "waiting": "Waiting",
+      "called": "Called",
+      "serving": "Serving",
+      "served": "Served",
+      "skipped": "Skipped",
+      "cancelled": "Cancelled"
+    }
+  },
+  "services": {
+    "title": "Services",
+    "add": "Add service",
+    "edit": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "nameAr": "Name (Arabic)",
+    "nameEn": "Name (English)",
+    "descAr": "Description (Arabic)",
+    "descEn": "Description (English)",
+    "duration": "Duration (minutes)",
+    "active": "Active"
+  },
+  "staff": {
+    "title": "Staff",
+    "add": "Add staff",
+    "email": "Staff email",
+    "remove": "Remove",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "settings": {
+    "title": "Business settings",
+    "nameAr": "Name (Arabic)",
+    "nameEn": "Name (English)",
+    "descAr": "Description (Arabic)",
+    "descEn": "Description (English)",
+    "phone": "Phone",
+    "addressAr": "Address (Arabic)",
+    "addressEn": "Address (English)",
+    "category": "Category",
+    "active": "Business active",
+    "save": "Save changes"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "save": "Save",
+    "cancel": "Cancel",
+    "selectBusiness": "Select business",
+    "noBusinesses": "No businesses assigned to your account"
+  },
+  "categories": {
+    "0": "Clinics",
+    "1": "Barbers",
+    "2": "Car services",
+    "3": "Government",
+    "4": "Repair",
+    "5": "Beauty",
+    "6": "Other"
+  }
+}
