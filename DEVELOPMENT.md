@@ -80,6 +80,20 @@ Build for production:
 npm run build
 ```
 
+### Run Mobile App
+
+```bash
+cd mobile/JordanQueue.Mobile
+npm install
+npm start
+```
+
+- Use **Expo Go** on your phone or an Android/iOS emulator
+- Default API URL: `http://10.0.2.2:5257` (Android emulator) or `http://localhost:5257` (iOS/web)
+- On a **physical device**, create `.env` with `EXPO_PUBLIC_API_URL=http://YOUR_PC_IP:5257`
+- Login: **customer1@jordanqueue.dev** / `Customer123!`
+- Try **Amman Barber** → **Haircut** → Join queue
+
 ## Project Structure
 
 ```
