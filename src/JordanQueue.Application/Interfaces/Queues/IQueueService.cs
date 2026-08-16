@@ -18,4 +18,5 @@ public interface IQueueService
     Task<TicketDto> SkipTicketAsync(Guid ticketId, Guid userId, CancellationToken cancellationToken = default);
     Task<TicketDto> CancelTicketAsync(Guid ticketId, Guid userId, bool isStaff, CancellationToken cancellationToken = default);
     Task<DailyStatsDto> GetDailyStatsAsync(Guid businessId, Guid userId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<TicketDto>> GetQueueTicketsAsync(Guid queueId, Guid userId, CancellationToken cancellationToken = default);
 }

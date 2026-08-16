@@ -53,6 +53,29 @@ public class BusinessService : IBusinessService
         return new PagedResult<BusinessDto> { Items = items, TotalCount = total, Page = request.Page, PageSize = request.PageSize };
     }
 
+    public async Task<IReadOnlyList<BusinessDto>> GetMineAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var ownedIds = await _context.Businesses
+            .Where(b => b.OwnerUserId == userId && b.IsActive)
+            .Select(b => b.Id)
+            .ToListAsync(cancellationToken);
+
+        var staffBusinessIds = await _context.BusinessStaff
+            .Where(s => s.UserId == userId && s.IsActive)
+            .Select(s => s.BusinessId)
+            .ToListAsync(cancellationToken);
+
+        var businessIds = ownedIds.Union(staffBusinessIds).Distinct().ToList();
+
+        return await _context.Businesses
+            .Where(b => businessIds.Contains(b.Id))
+            .OrderBy(b => b.NameEnglish)
+            .Select(b => new BusinessDto(
+                b.Id, b.NameArabic, b.NameEnglish, b.DescriptionArabic, b.DescriptionEnglish,
+                b.PhoneNumber, b.AddressArabic, b.AddressEnglish, b.Category, b.IsActive))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<BusinessDetailDto> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         var business = await _context.Businesses.FirstOrDefaultAsync(b => b.Id == id, cancellationToken)

@@ -50,6 +50,19 @@ if (!builder.Environment.IsEnvironment("Testing"))
 
 builder.Services.AddProblemDetails();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AdminPortal", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:5173",
+                "http://127.0.0.1:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 app.UseExceptionHandler(errorApp =>
@@ -101,6 +114,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AdminPortal");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

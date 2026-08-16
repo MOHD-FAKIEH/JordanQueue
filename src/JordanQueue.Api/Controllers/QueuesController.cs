@@ -39,6 +39,14 @@ public class QueuesController : ControllerBase
     }
 
     [Authorize(Roles = $"{RoleNames.BusinessOwner},{RoleNames.Staff}")]
+    [HttpGet("{queueId:guid}/tickets")]
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<TicketDto>>>> GetTickets(Guid queueId, CancellationToken cancellationToken)
+    {
+        var result = await _queueService.GetQueueTicketsAsync(queueId, GetUserId(), cancellationToken);
+        return Ok(ApiResponse<IReadOnlyList<TicketDto>>.Ok(result));
+    }
+
+    [Authorize(Roles = $"{RoleNames.BusinessOwner},{RoleNames.Staff}")]
     [HttpPost("{queueId:guid}/next")]
     public async Task<ActionResult<ApiResponse<TicketDto>>> CallNext(Guid queueId, CancellationToken cancellationToken)
     {
